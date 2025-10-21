@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://g2w2608bc2dy"
-path="res://.godot/imported/cloud.glb-53daedc24f8d7f4baa42baf232c66643.scn"
+uid="uid://cxhf6iirlv4tm"
+path="res://.godot/imported/pistol.glb-fc3cb9deb081cfd06a6c46c3c528ce09.scn"
 
 [deps]
 
-source_file="res://models/cloud.glb"
-dest_files=["res://.godot/imported/cloud.glb-53daedc24f8d7f4baa42baf232c66643.scn"]
+source_file="res://models/pistol.glb"
+dest_files=["res://.godot/imported/pistol.glb-fc3cb9deb081cfd06a6c46c3c528ce09.scn"]
 
 [params]
 
@@ -37,6 +37,12 @@ import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
-_subresources={}
-gltf/naming_version=1
+_subresources={
+"nodes": {
+"PATH:Cylinder_013_bolt_0": {
+"generate/physics": true
+}
+}
+}
+gltf/naming_version=2
 gltf/embedded_image_handling=1

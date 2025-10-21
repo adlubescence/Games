@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://cr625f6fhn20p"]
+
+[ext_resource type="PackedScene" uid="uid://cxhf6iirlv4tm" path="res://models/pistol.glb" id="1_sh8ei"]
+
+[node name="Pistol" type="Node3D"]
+
+[node name="pistol" parent="." instance=ExtResource("1_sh8ei")]
