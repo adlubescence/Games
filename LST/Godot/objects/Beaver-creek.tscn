@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cumqp8chcrcnf"]
+
+[ext_resource type="PackedScene" uid="uid://m6wvebjjdow5" path="res://models/Beaver-Creek.glb" id="1_2lc5u"]
+
+[node name="BeaverCreek" type="Node3D"]
+
+[node name="Beaver-Creek" parent="." instance=ExtResource("1_2lc5u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.240335, 0.3753929, 20.882051)

@@ -1,0 +1,12 @@
+res://scenes/main.tscn
+res://scenes/main-environment.tres
+res://sprites/burst_animation.tres
+res://weapons/blaster-repeater.tres
+res://scripts/weapon.gd
+res://weapons/blaster.tres
+res://objects/Beaver-creek.tscn
+res://scripts/hud.gd
+res://objects/player.gd
+res://objects/pistol.tscn
+res://weapons/pistol.tres
+res://objects/blaster.tscn
