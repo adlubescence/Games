@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://c46p6ecxu0l28"]
+
+[ext_resource type="Script" uid="uid://ofuvn38brqwh" path="res://scenes/title_screen.gd" id="1_20w21"]
+
+[node name="TitleScreen" type="Node3D"]
+script = ExtResource("1_20w21")
+
+[node name="Button" type="Button" parent="."]
+offset_left = 16.0
+offset_top = 7.0
+offset_right = 392.0
+offset_bottom = 209.0
+text = "Penus"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
