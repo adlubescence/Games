@@ -10,3 +10,4 @@ res://objects/player.gd
 res://objects/pistol.tscn
 res://weapons/pistol.tres
 res://objects/blaster.tscn
+res://README.md
