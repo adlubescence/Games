@@ -34,7 +34,6 @@ var tween:Tween
 
 signal health_updated
 
-@onready var camera = $Head/Camera
 @onready var raycast = $Head/Camera/RayCast
 @onready var muzzle = $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Muzzle
 @onready var container = $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Container
@@ -78,19 +77,19 @@ func _process(delta):
 	
 	sound_footsteps.stream_paused = true
 	
-	if is_on_floor():
-		if abs(velocity.x) > 1 or abs(velocity.z) > 1:
-			sound_footsteps.stream_paused = false
+	#if is_on_floor():
+	#	if abs(velocity.x) > 1 or abs(velocity.z) > 1:
+	#		sound_footsteps.stream_paused = false
 	
 	# Landing after jump or falling
 	
-	camera.position.y = lerp(camera.position.y, 0.0, delta * 5)
+	# camera.position.y = lerp(camera.position.y, 0.0, delta * 5)
 	
-	if is_on_floor() and gravity > 1 and !previously_floored: # Landed
-		Audio.play("sounds/land.ogg")
-		camera.position.y = -0.1
+	# if is_on_floor() and gravity > 1 and !previously_floored: # Landed
+	#	Audio.play("sounds/land.ogg")
+	#	camera.position.y = -0.1
 	
-	previously_floored = is_on_floor()
+	# previously_floored = is_on_floor()
 	
 	# Falling/respawning
 	
@@ -148,12 +147,12 @@ func handle_rotation(xRot: float, yRot: float, isController: bool, delta: float 
 	if isController:
 		rotation_target -= Vector3(-yRot, -xRot, 0).limit_length(1.0) * gamepad_sensitivity
 		rotation_target.x = clamp(rotation_target.x, deg_to_rad(-90), deg_to_rad(90))
-		camera.rotation.x = lerp_angle(camera.rotation.x, rotation_target.x, delta * 25)
+		#camera.rotation.x = lerp_angle(camera.rotation.x, rotation_target.x, delta * 25)
 		rotation.y = lerp_angle(rotation.y, rotation_target.y, delta * 25)
 	else:
 		rotation_target += (Vector3(-yRot, -xRot, 0) / mouse_sensitivity)
 		rotation_target.x = clamp(rotation_target.x, deg_to_rad(-90), deg_to_rad(90))
-		camera.rotation.x = rotation_target.x;
+		#camera.rotation.x = rotation_target.x;
 		rotation.y = rotation_target.y;
 	
 # Handle gravity
@@ -221,10 +220,10 @@ func action_shoot():
 			get_tree().root.add_child(impact_instance)
 			
 			impact_instance.position = raycast.get_collision_point() + (raycast.get_collision_normal() / 10)
-			impact_instance.look_at(camera.global_transform.origin, Vector3.UP, true)
+			#impact_instance.look_at(camera.global_transform.origin, Vector3.UP, true)
 			
 		container.position.z += 0.25 # Knockback of weapon visual
-		camera.rotation.x += 0.025 # Knockback of camera
+		#camera.rotation.x += 0.025 # Knockback of camera
 		movement_velocity += Vector3(0, 0, weapon.knockback) # Knockback
 
 # Toggle between available weapons (listed in 'weapons')

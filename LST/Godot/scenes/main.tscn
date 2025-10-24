@@ -28,6 +28,7 @@ outline_color = Color(0, 0, 0, 0.470588)
 environment = ExtResource("1_q8fpv")
 
 [node name="Player" parent="." node_paths=PackedStringArray("crosshair") instance=ExtResource("2_elriq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0007442236, 0.5093813, -0.002854824)
 weapons = Array[ExtResource("3_jkv2x")]([ExtResource("4_jbj1t"), ExtResource("5_muem4"), ExtResource("6_dp3eg")])
 crosshair = NodePath("../HUD/Crosshair")
 
