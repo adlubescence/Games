@@ -11,7 +11,7 @@ extends CharacterBody3D
 var weapon: Weapon
 var weapon_index := 0
 
-var mouse_sensitivity = 700
+var mouse_sensitivity = 650
 var gamepad_sensitivity := 0.075
 
 var mouse_captured := true
