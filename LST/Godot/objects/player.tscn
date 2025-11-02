@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dl2ed4gkybggf"]
+[gd_scene load_steps=12 format=3 uid="uid://dl2ed4gkybggf"]
 
 [ext_resource type="Script" uid="uid://cu47grjp072jk" path="res://objects/player.gd" id="1_ffboj"]
 [ext_resource type="Resource" uid="uid://cu2gtxlcmbb34" path="res://weapons/blaster-repeater.tres" id="2_6epbw"]
@@ -7,6 +7,9 @@
 [ext_resource type="Resource" uid="uid://c56y8pqoyk15f" path="res://weapons/blaster.tres" id="3_kr4p8"]
 [ext_resource type="SpriteFrames" uid="uid://dbv3sy5qjatnl" path="res://sprites/burst_animation.tres" id="4_m6ukc"]
 [ext_resource type="AudioStream" uid="uid://cydjn1ct3hps2" path="res://sounds/walking.ogg" id="5_ics1s"]
+[ext_resource type="Texture2D" uid="uid://2jld33y6h5pq" path="res://sprites/crosshair.png" id="6_3rfka"]
+[ext_resource type="Script" uid="uid://deu3dabap4m2q" path="res://objects/ray_cast.gd" id="6_i8sra"]
+[ext_resource type="Texture2D" uid="uid://ce3lgq7foiusl" path="res://sprites/crosshair-repeater.png" id="8_4vq5b"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_gdq8c"]
 radius = 0.3
@@ -31,6 +34,7 @@ current = true
 fov = 80.0
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="Head/fpv_camera"]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -43,7 +47,7 @@ transparent_bg = true
 handle_input_locally = false
 msaa_3d = 1
 size = Vector2i(1920, 1080)
-render_target_update_mode = 4
+render_target_update_mode = 0
 
 [node name="CameraItem" type="Camera3D" parent="Head/fpv_camera/SubViewportContainer/SubViewport"]
 cull_mask = 1047554
@@ -58,10 +62,23 @@ layers = 2
 sprite_frames = ExtResource("4_m6ukc")
 frame = 2
 
-[node name="RayCast" type="RayCast3D" parent="Head/fpv_camera"]
+[node name="RayCast" type="RayCast3D" parent="Head"]
 exclude_parent = false
 target_position = Vector3(0, 0, -10)
 collide_with_areas = true
+script = ExtResource("6_i8sra")
+
+[node name="perma_crosshair" type="Sprite3D" parent="Head/RayCast"]
+billboard = 1
+no_depth_test = true
+render_priority = 1
+texture = ExtResource("6_3rfka")
+
+[node name="active_crosshair" type="Sprite3D" parent="Head/RayCast"]
+billboard = 1
+no_depth_test = true
+render_priority = 1
+texture = ExtResource("8_4vq5b")
 
 [node name="Shadow" type="Decal" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.9, 0)
@@ -79,7 +96,7 @@ autoplay = true
 one_shot = true
 
 [node name="TPVPivot" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.033169508, 0)
 
 [node name="SpringArm3D" type="SpringArm3D" parent="TPVPivot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

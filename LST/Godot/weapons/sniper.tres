@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="Sniper" load_steps=2 format=3 uid="uid://b88rbhn336d2n"]
+
+[ext_resource type="Script" uid="uid://c863ve8dxdwku" path="res://scripts/sniper.gd" id="1_6iw1s"]
+
+[resource]
+script = ExtResource("1_6iw1s")

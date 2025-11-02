@@ -40,7 +40,7 @@ signal health_updated
 @onready var first_person_camera = $Head/fpv_camera
 @onready var third_person_arm = $TPVPivot/SpringArm3D
 @onready var tpv_pivot = $TPVPivot
-@onready var fpv_raycast = $Head/fpv_camera/RayCast
+@onready var fpv_raycast = $Head/RayCast
 @onready var head = $Head
 
 @onready var muzzle = $Head/fpv_camera/SubViewportContainer/SubViewport/CameraItem/Muzzle
