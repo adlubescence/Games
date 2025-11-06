@@ -2,7 +2,6 @@ extends CharacterBody3D
 
 @export_subgroup("Properties")
 @export var movement_speed = 5
-@export_range(0, 100) var number_of_jumps:int = 2
 @export var jump_strength = 8
 
 @export_subgroup("Weapons")
@@ -26,25 +25,22 @@ var gravity := 0.0
 
 var previously_floored := false
 
-var jumps_remaining:int
-
 var first_person_viewport_offset = Vector3(1.2, -1.1, -2.75)
 
 var tween:Tween
 
-const third_person = "third"
-const first_person = "first"
-
 signal health_updated
 
-@onready var first_person_camera = $Head/fpv_camera
+@onready var first_person_camera = $Head/FPVCamera
+@onready var third_person_camera = $TPVPivot/SpringArm3D/TPVCamera
+
 @onready var third_person_arm = $TPVPivot/SpringArm3D
 @onready var tpv_pivot = $TPVPivot
-@onready var fpv_raycast = $Head/fpv_camera/RayCast
+@onready var weapon_raycast = $Head/FPVCamera/FPVRayCast
 @onready var head = $Head
 
-@onready var muzzle = $Head/fpv_camera/SubViewportContainer/SubViewport/CameraItem/Muzzle
-@onready var first_person_viewport = $Head/fpv_camera/SubViewportContainer/SubViewport/CameraItem/Container
+@onready var muzzle = $Head/FPVCamera/SubViewportContainer/SubViewport/CameraItem/Muzzle
+@onready var first_person_viewport = $Head/FPVCamera/SubViewportContainer/SubViewport/CameraItem/Container
 @onready var sound_footsteps = $SoundFootsteps
 @onready var blaster_cooldown = $Cooldown
 
@@ -52,11 +48,11 @@ signal health_updated
 
 @export var crosshair:TextureRect
 
-var current_camera = first_person
+var current_camera = null
 # Functions
 
 func _ready():
-	
+	current_camera = first_person_camera
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	weapon = weapons[weapon_index] # Weapon must never be nil
 	initiate_change_weapon(weapon_index)
@@ -93,11 +89,11 @@ func _process(delta):
 	
 	# Landing after jump or falling
 	
-	first_person_camera.position.y = lerp(first_person_camera.position.y, 0.0, delta * 5)
+	current_camera.position.y = lerp(current_camera.position.y, 0.0, delta * 5)
 	
 	if is_on_floor() and gravity > 1 and !previously_floored: # Landed
 		Audio.play("sounds/land.ogg")
-		first_person_camera.position.y = -0.1
+		current_camera.position.y = -0.1
 	
 	previously_floored = is_on_floor()
 	
@@ -110,7 +106,7 @@ func _process(delta):
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and mouse_captured:
 		input_mouse = event.relative * mouse_sensitivity
-		handle_rotation(event.relative.x, event.relative.y, false)
+		mouse_rotation(event.relative.x, event.relative.y)
 
 
 func handle_controls(delta):
@@ -137,7 +133,7 @@ func handle_controls(delta):
 	# Handle Controller Rotation
 	var rotation_input := Input.get_vector("camera_right", "camera_left", "camera_down", "camera_up")
 	if rotation_input:
-		handle_rotation(rotation_input.x, rotation_input.y, true, delta)
+		controller_rotation(rotation_input.x, rotation_input.y, delta)
 	
 	# Shooting
 	
@@ -145,10 +141,8 @@ func handle_controls(delta):
 	
 	# Jumping
 	
-	if Input.is_action_just_pressed("jump"):
-		
-		if jumps_remaining:
-			action_jump()
+	if Input.is_action_just_pressed("jump") and is_on_floor():
+		action_jump()
 		
 	# Weapon switching
 	
@@ -157,32 +151,37 @@ func handle_controls(delta):
 # Camera toggle
 func handle_toggle_camera():
 	if Input.is_action_just_pressed("toggle_camera"):
-		if current_camera == first_person:
-			current_camera = third_person
+		if current_camera == first_person_camera:
+			third_person_camera.rotation = current_camera.rotation
+
+			current_camera = third_person_camera
+			third_person_camera.current = true
+			first_person_camera.current = false
+			
 			first_person_viewport.visible = false
 			muzzle.visible = false
-			first_person_camera.reparent(third_person_arm)
 		else:
-			current_camera = first_person
+			first_person_camera.rotation = current_camera.rotation
+			
+			current_camera = first_person_camera
+			first_person_camera.current = true
+			third_person_camera.current = false
+			
 			first_person_viewport.visible = true
 			muzzle.visible = true
-			first_person_camera.reparent(head)
-			first_person_camera.position = head.position
-			
 
-# rotation
-func handle_rotation(xRot: float, yRot: float, isController: bool, delta: float = 0.0):
-	if isController:
-		rotation_target -= Vector3(-yRot, -xRot, 0).limit_length(1.0) * gamepad_sensitivity
-		rotation_target.x = clamp(rotation_target.x, deg_to_rad(-90), deg_to_rad(90))
-		first_person_camera.rotation.x = lerp_angle(first_person_camera.rotation.x, rotation_target.x, delta * 25)
-		rotation.y = lerp_angle(rotation.y, rotation_target.y, delta * 25)
-	else:
+func mouse_rotation(xRot: float, yRot: float):
 		rotation_target += (Vector3(-yRot, -xRot, 0) * mouse_sensitivity)
 		rotation_target.x = clamp(rotation_target.x, deg_to_rad(-90), deg_to_rad(90))
-		first_person_camera.rotation.x = rotation_target.x
+		current_camera.rotation.x = rotation_target.x
 		rotation.y = rotation_target.y
-		head.rotation.x = first_person_camera.rotation.x
+		head.rotation.x = current_camera.rotation.x
+		
+func controller_rotation(xRot: float, yRot: float, delta: float = 0.0):
+		rotation_target -= Vector3(-yRot, -xRot, 0).limit_length(1.0) * gamepad_sensitivity
+		rotation_target.x = clamp(rotation_target.x, deg_to_rad(-90), deg_to_rad(90))
+		current_camera.rotation.x = lerp_angle(current_camera.rotation.x, rotation_target.x, delta * 25)
+		rotation.y = lerp_angle(rotation.y, rotation_target.y, delta * 25)
 
 # Handle gravity
 
@@ -190,7 +189,6 @@ func handle_gravity(delta):
 	gravity += 20 * delta
 	
 	if gravity > 0 and is_on_floor():
-		jumps_remaining = number_of_jumps
 		gravity = 0
 
 # Jumping
@@ -198,7 +196,6 @@ func handle_gravity(delta):
 func action_jump():	
 	Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")
 	gravity = -jump_strength	
-	jumps_remaining -= 1
 
 # Shooting
 
@@ -224,14 +221,14 @@ func action_shoot():
 		# Shoot the weapon, amount based on shot count
 		
 		for n in weapon.shot_count:
-			fpv_raycast.target_position.x = randf_range(-weapon.spread, weapon.spread)
-			fpv_raycast.target_position.y = randf_range(-weapon.spread, weapon.spread)
+			#weapon_raycast.target_position.x = randf_range(-weapon.spread, weapon.spread)
+			#weapon_raycast.target_position.y = randf_range(-weapon.spread, weapon.spread)
 			
-			fpv_raycast.force_raycast_update()
+			#weapon_raycast.force_raycast_update()
 			
-			if !fpv_raycast.is_colliding(): continue # Don't create impact when raycast didn't hit
+			if !weapon_raycast.is_colliding(): continue # Don't create impact when weapon_raycast didn't hit
 			
-			var collider = fpv_raycast.get_collider()
+			var collider = weapon_raycast.get_collider()
 			
 			# Hitting an enemy
 			
@@ -247,13 +244,13 @@ func action_shoot():
 			
 			get_tree().root.add_child(impact_instance)
 			
-			impact_instance.position = fpv_raycast.get_collision_point() + (fpv_raycast.get_collision_normal() / 10)
-			impact_instance.look_at(first_person_camera.global_transform.origin, Vector3.UP, true)
+			impact_instance.position = weapon_raycast.get_collision_point() + (weapon_raycast.get_collision_normal() / 10)
+			impact_instance.look_at(current_camera.global_transform.origin, Vector3.UP, true)
 			
-		first_person_viewport.position.z += 0.25 # Knockback of weapon visual
+		#first_person_viewport.position.z += 0.25 # Knockback of weapon visual
 		#first_person_camera.rotation.x += 0.025 # Knockback of first_person_camera
 
-		movement_velocity += Vector3(0, 0, weapon.knockback) # Knockback
+		#movement_velocity += Vector3(0, 0, weapon.knockback) # Knockback
 
 # Toggle between available weapons (listed in 'weapons')
 
@@ -303,7 +300,7 @@ func change_weapon():
 		
 	# Set weapon data
 	
-	fpv_raycast.target_position = Vector3(0, 0, -1) * weapon.max_distance
+	weapon_raycast.target_position = Vector3(0, 0, -1) * weapon.max_distance
 	crosshair.texture = weapon.crosshair
 
 func damage(amount):

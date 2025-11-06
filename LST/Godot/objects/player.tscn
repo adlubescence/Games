@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dl2ed4gkybggf"]
+[gd_scene load_steps=11 format=3 uid="uid://dl2ed4gkybggf"]
 
 [ext_resource type="Script" uid="uid://cu47grjp072jk" path="res://objects/player.gd" id="1_ffboj"]
 [ext_resource type="Resource" uid="uid://cu2gtxlcmbb34" path="res://weapons/blaster-repeater.tres" id="2_6epbw"]
@@ -7,6 +7,8 @@
 [ext_resource type="Resource" uid="uid://c56y8pqoyk15f" path="res://weapons/blaster.tres" id="3_kr4p8"]
 [ext_resource type="SpriteFrames" uid="uid://dbv3sy5qjatnl" path="res://sprites/burst_animation.tres" id="4_m6ukc"]
 [ext_resource type="AudioStream" uid="uid://cydjn1ct3hps2" path="res://sounds/walking.ogg" id="5_ics1s"]
+[ext_resource type="Texture2D" uid="uid://2jld33y6h5pq" path="res://sprites/crosshair.png" id="6_3rfka"]
+[ext_resource type="Script" uid="uid://cd0ohclblha8w" path="res://objects/ray_cast.gd" id="6_i8sra"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_gdq8c"]
 radius = 0.3
@@ -25,12 +27,12 @@ debug_color = Color(0.96862745, 0, 0.47058824, 1)
 [node name="Head" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
-[node name="fpv_camera" type="Camera3D" parent="Head"]
+[node name="FPVCamera" type="Camera3D" parent="Head"]
 cull_mask = 1048573
 current = true
 fov = 80.0
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="Head/fpv_camera"]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="Head/FPVCamera"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -38,30 +40,45 @@ grow_horizontal = 2
 grow_vertical = 2
 stretch = true
 
-[node name="SubViewport" type="SubViewport" parent="Head/fpv_camera/SubViewportContainer"]
+[node name="SubViewport" type="SubViewport" parent="Head/FPVCamera/SubViewportContainer"]
 transparent_bg = true
 handle_input_locally = false
 msaa_3d = 1
 size = Vector2i(1920, 1080)
 render_target_update_mode = 4
 
-[node name="CameraItem" type="Camera3D" parent="Head/fpv_camera/SubViewportContainer/SubViewport"]
+[node name="CameraItem" type="Camera3D" parent="Head/FPVCamera/SubViewportContainer/SubViewport"]
 cull_mask = 1047554
 fov = 40.0
 
-[node name="Container" type="Node3D" parent="Head/fpv_camera/SubViewportContainer/SubViewport/CameraItem"]
+[node name="Container" type="Node3D" parent="Head/FPVCamera/SubViewportContainer/SubViewport/CameraItem"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, -1, -2.25)
 
-[node name="Muzzle" type="AnimatedSprite3D" parent="Head/fpv_camera/SubViewportContainer/SubViewport/CameraItem"]
+[node name="Muzzle" type="AnimatedSprite3D" parent="Head/FPVCamera/SubViewportContainer/SubViewport/CameraItem"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.75, -6)
 layers = 2
 sprite_frames = ExtResource("4_m6ukc")
 frame = 2
 
-[node name="RayCast" type="RayCast3D" parent="Head/fpv_camera"]
+[node name="FPVRayCast" type="RayCast3D" parent="Head/FPVCamera"]
 exclude_parent = false
 target_position = Vector3(0, 0, -10)
 collide_with_areas = true
+script = ExtResource("6_i8sra")
+
+[node name="perma_crosshair" type="Sprite3D" parent="Head/FPVCamera/FPVRayCast"]
+visible = false
+billboard = 1
+no_depth_test = true
+render_priority = 1
+texture = ExtResource("6_3rfka")
+
+[node name="active_crosshair" type="Sprite3D" parent="Head/FPVCamera/FPVRayCast"]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+billboard = 1
+no_depth_test = true
+render_priority = 1
+texture = ExtResource("6_3rfka")
 
 [node name="Shadow" type="Decal" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.9, 0)
@@ -84,3 +101,27 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.75, 0)
 [node name="SpringArm3D" type="SpringArm3D" parent="TPVPivot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 spring_length = 2.0
+
+[node name="TPVCamera" type="Camera3D" parent="TPVPivot/SpringArm3D"]
+visible = false
+
+[node name="TPVRayCast" type="RayCast3D" parent="TPVPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3836081, 0)
+visible = false
+exclude_parent = false
+target_position = Vector3(0, 0, -10)
+collide_with_areas = true
+script = ExtResource("6_i8sra")
+
+[node name="perma_crosshair" type="Sprite3D" parent="TPVPivot/TPVRayCast"]
+billboard = 1
+no_depth_test = true
+render_priority = 1
+texture = ExtResource("6_3rfka")
+
+[node name="active_crosshair" type="Sprite3D" parent="TPVPivot/TPVRayCast"]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+billboard = 1
+no_depth_test = true
+render_priority = 1
+texture = ExtResource("6_3rfka")
